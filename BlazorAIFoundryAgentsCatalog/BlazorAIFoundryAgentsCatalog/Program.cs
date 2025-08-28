@@ -1,5 +1,7 @@
 using BlazorAIFoundryAgentsCatalog.Client.Pages;
 using BlazorAIFoundryAgentsCatalog.Components;
+using BlazorAIFoundryAgentsCatalog.Options;
+using BlazorAIFoundryAgentsCatalog.Services;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,11 @@ builder.Services.AddMudServices();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.Configure<AzureAIFoundryOptions>(
+    builder.Configuration.GetSection("AzureAIFoundry"));
+
+builder.Services.AddScoped<IAzureAIFoundryService, AzureAIFoundryService>();
 
 var app = builder.Build();
 
