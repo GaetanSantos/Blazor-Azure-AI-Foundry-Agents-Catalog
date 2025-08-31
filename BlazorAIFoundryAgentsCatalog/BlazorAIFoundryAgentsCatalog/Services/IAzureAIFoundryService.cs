@@ -1,4 +1,5 @@
-﻿using BlazorAIFoundryAgentsCatalog.Shared;
+﻿
+using BlazorAIFoundryAgentsCatalog.Client.DTOs;
 
 namespace BlazorAIFoundryAgentsCatalog.Services
 {

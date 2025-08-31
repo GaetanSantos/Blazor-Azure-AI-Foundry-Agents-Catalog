@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36414.22 d17.14
+VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAIFoundryAgentsCatalog", "BlazorAIFoundryAgentsCatalog\BlazorAIFoundryAgentsCatalog.csproj", "{A96A0358-473F-4C33-B3C6-12E7F1E3E07A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAIFoundryAgentsCatalog.Client", "BlazorAIFoundryAgentsCatalog.Client\BlazorAIFoundryAgentsCatalog.Client.csproj", "{66C80B55-46B5-426B-8E5B-786F1B807B82}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorAIFoundryAgentsCatalog.Shared", "BlazorAIFoundryAgentsCatalog.Shared\BlazorAIFoundryAgentsCatalog.Shared.csproj", "{F8F6E089-ECB0-4F76-9F09-02FCE3835F79}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{66C80B55-46B5-426B-8E5B-786F1B807B82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66C80B55-46B5-426B-8E5B-786F1B807B82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66C80B55-46B5-426B-8E5B-786F1B807B82}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F8F6E089-ECB0-4F76-9F09-02FCE3835F79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F8F6E089-ECB0-4F76-9F09-02FCE3835F79}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F8F6E089-ECB0-4F76-9F09-02FCE3835F79}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F8F6E089-ECB0-4F76-9F09-02FCE3835F79}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

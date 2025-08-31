@@ -1,9 +1,9 @@
 ﻿using Azure.AI.Projects;
 using Azure.AI.Agents.Persistent;
 using Azure.Identity;
-using BlazorAIFoundryAgentsCatalog.Shared;
 using BlazorAIFoundryAgentsCatalog.Options;
 using Microsoft.Extensions.Options;
+
 
 namespace BlazorAIFoundryAgentsCatalog.Services
 {
@@ -16,7 +16,7 @@ namespace BlazorAIFoundryAgentsCatalog.Services
             _options = options.Value;
         }
 
-        public async Task<IEnumerable<AgentDto>> GetAgents()
+        public async Task<IEnumerable<Client.DTOs.AgentDto>> GetAgents()
         {
             var endpointUri = new Uri(_options.EndpointUrl);
             var credential = new DefaultAzureCredential();

@@ -8,7 +8,6 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BlazorAIFoundryAgentsCatalog.Shared\BlazorAIFoundryAgentsCatalog.Shared.csproj" />
     <ProjectReference Include="..\BlazorAIFoundryAgentsCatalog.Client\BlazorAIFoundryAgentsCatalog.Client.csproj" />
     <PackageReference Include="Azure.AI.Agents.Persistent" Version="1.2.0-beta.3" />
     <PackageReference Include="Azure.AI.Projects" Version="1.0.0-beta.11" />

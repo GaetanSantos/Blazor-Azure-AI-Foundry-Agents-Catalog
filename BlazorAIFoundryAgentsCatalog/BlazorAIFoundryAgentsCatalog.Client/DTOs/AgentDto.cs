@@ -1,4 +1,4 @@
-﻿namespace BlazorAIFoundryAgentsCatalog.Shared
+﻿namespace BlazorAIFoundryAgentsCatalog.Client.DTOs
 {
     public record AgentDto(
         string Id,
