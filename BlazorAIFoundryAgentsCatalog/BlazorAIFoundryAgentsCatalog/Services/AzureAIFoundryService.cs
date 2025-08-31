@@ -3,6 +3,7 @@ using Azure.AI.Agents.Persistent;
 using Azure.Identity;
 using BlazorAIFoundryAgentsCatalog.Options;
 using Microsoft.Extensions.Options;
+using BlazorAIFoundryAgentsCatalog.Client.DTOs;
 
 
 namespace BlazorAIFoundryAgentsCatalog.Services

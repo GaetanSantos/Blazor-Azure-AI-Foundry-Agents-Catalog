@@ -1,10 +1,40 @@
 ﻿
+@using BlazorAIFoundryAgentsCatalog.Client.DTOs
+@using BlazorAIFoundryAgentsCatalog.Client.Services
+
+@inject IAgentCatalogService agentCatalogService
+
 <MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Counter</MudNavLink>
-    
     <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Weather</MudNavLink>
 
+    @if (agents is null)
+    {
+        <MudText>Loading agents...</MudText>
+    }
+    else
+    {
+        @foreach (var agent in agents)
+        {
+            <MudNavLink Href="@($"/agents/{agent.Id}")" Icon="@Icons.Material.Filled.Person">
+                @agent.Name
+            </MudNavLink>
+        }
+    }
 </MudNavMenu>
 
+@code {
+    private List<AgentDto>? agents;
+    private bool _loaded = false;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_loaded)
+        {
+            agents = await agentCatalogService.GetAgentsAsync();
+            _loaded = true;
+            StateHasChanged();
+        }
+    }
+}

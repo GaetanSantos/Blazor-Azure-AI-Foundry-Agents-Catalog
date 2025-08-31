@@ -18,6 +18,8 @@ builder.Services.Configure<AzureAIFoundryOptions>(
 
 builder.Services.AddScoped<IAzureAIFoundryService, AzureAIFoundryService>();
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -41,5 +43,7 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(BlazorAIFoundryAgentsCatalog.Client._Imports).Assembly);
+
+app.MapControllers();
 
 app.Run();

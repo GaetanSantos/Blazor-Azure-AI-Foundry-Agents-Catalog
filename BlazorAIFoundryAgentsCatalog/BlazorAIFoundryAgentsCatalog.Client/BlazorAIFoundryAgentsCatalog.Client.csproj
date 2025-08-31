@@ -13,8 +13,4 @@
     <PackageReference Include="MudBlazor" Version="8.*" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\BlazorAIFoundryAgentsCatalog.Shared\BlazorAIFoundryAgentsCatalog.Shared.csproj" />
-  </ItemGroup>
-
 </Project>
