@@ -1,0 +1,153 @@
+﻿@page "/agents/{AgentId}"
+@using BlazorAIFoundryAgentsCatalog.Client.DTOs
+@using BlazorAIFoundryAgentsCatalog.Client.Services
+@inject IAgentChatService AgentChatService
+
+<PageTitle>Agent Chat</PageTitle>
+
+<MudPaper Class="pa-4" Elevation="0">
+    <MudText Typo="Typo.h5" GutterBottom="true">Chat with Agent @AgentId</MudText>
+
+    <div style="height:60vh; max-width:600px; overflow-y:auto;" class="mb-4">
+        @if (messages is null)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (!messages.Any())
+        {
+            <MudChat ChatPosition="ChatBubblePosition.Start">
+                <MudChatBubble Avatar="@Icons.Material.Filled.SupportAgent">
+                    No messages yet. Say hi!
+                </MudChatBubble>
+            </MudChat>
+        }
+        else
+        {
+            @foreach (var group in GetGroupedMessages())
+            {
+                <MudChat UserName="@(group.Role == "user" ? "You" : "Agent")"
+                         UserAvatar="@(group.Role == "user" ? Icons.Material.Filled.Person : Icons.Material.Filled.SupportAgent)"
+                         ChatPosition="@(group.Role == "user" ? ChatBubblePosition.End : ChatBubblePosition.Start)">
+                    @foreach (var m in group.Messages)
+                    {
+                        <MudChatBubble Time="@m.Timestamp.ToLocalTime().ToString("g")">
+                            @m.Content
+                        </MudChatBubble>
+                    }
+                </MudChat>
+            }
+        }
+    </div>
+
+    <MudStack Direction="Row" Spacing="1">
+        <MudTextField @bind-Value="currentText"
+                      Placeholder="Type a message..."
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Edit"
+                      FullWidth="true"
+                      OnKeyDown="OnInputKeyDown" />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   OnClick="SendAndRefreshHistory"
+                   Disabled="@isLoading">
+            Send
+        </MudButton>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string AgentId { get; set; } = string.Empty;
+
+    private List<ChatMessageDto>? messages;
+    private string threadId = string.Empty;
+    private string currentText = string.Empty;
+    private bool isLoading = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await ResetAgentContext(); 
+
+    }
+
+    private Task ResetAgentContext()
+    {
+        return Task.Run(() =>
+        {
+            isLoading = true;
+            messages = new();
+            threadId = string.Empty;
+            isLoading = false;
+            StateHasChanged();
+        });
+    }
+
+    private async Task SendAndRefreshHistory()
+    {
+        if (string.IsNullOrWhiteSpace(currentText)) return;
+
+        isLoading = true;
+
+        // Optimistically add the user's message
+        var userMsg = new ChatMessageDto(
+            AgentId: AgentId,
+            Role: "user",
+            Content: currentText,
+            Timestamp: DateTime.UtcNow
+        );
+        messages ??= new List<ChatMessageDto>();
+        messages.Add(userMsg);
+        StateHasChanged();
+
+        var chatThread = await AgentChatService.SendMessageAndGetHistoryAsync(AgentId, currentText, threadId);
+        if (chatThread is not null)
+        {
+            messages = chatThread.Messages;
+            currentText = string.Empty;
+            StateHasChanged();
+            if (string.IsNullOrWhiteSpace(threadId))
+            {
+                threadId = chatThread.ThreadId;
+            }
+        }
+
+        isLoading = false;
+    }
+
+    private async Task OnInputKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !isLoading)
+        {
+            await SendAndRefreshHistory();
+        }
+    }
+
+    // Helper to group consecutive messages by sender
+    private IEnumerable<MessageGroup> GetGroupedMessages()
+    {
+        if (messages is null || messages.Count == 0)
+            yield break;
+
+        string? lastRole = null;
+        List<ChatMessageDto> group = new();
+
+        foreach (var msg in messages)
+        {
+            if (lastRole == null || msg.Role == lastRole)
+            {
+                group.Add(msg);
+            }
+            else
+            {
+                yield return new MessageGroup(lastRole, group.ToList());
+                group.Clear();
+                group.Add(msg);
+            }
+            lastRole = msg.Role;
+        }
+        if (group.Count > 0 && lastRole != null)
+            yield return new MessageGroup(lastRole, group);
+    }
+
+    private record MessageGroup(string Role, List<ChatMessageDto> Messages);
+}

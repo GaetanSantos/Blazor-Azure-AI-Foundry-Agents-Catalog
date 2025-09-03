@@ -1,4 +1,5 @@
 using BlazorAIFoundryAgentsCatalog.Client.Pages;
+using BlazorAIFoundryAgentsCatalog.Client.Services;
 using BlazorAIFoundryAgentsCatalog.Components;
 using BlazorAIFoundryAgentsCatalog.Options;
 using BlazorAIFoundryAgentsCatalog.Services;
@@ -17,6 +18,7 @@ builder.Services.Configure<AzureAIFoundryOptions>(
     builder.Configuration.GetSection("AzureAIFoundry"));
 
 builder.Services.AddScoped<IAzureAIFoundryService, AzureAIFoundryService>();
+builder.Services.AddScoped<IFoundryAgentProvider, FoundryAgentProvider>();
 
 builder.Services.AddControllers();
 

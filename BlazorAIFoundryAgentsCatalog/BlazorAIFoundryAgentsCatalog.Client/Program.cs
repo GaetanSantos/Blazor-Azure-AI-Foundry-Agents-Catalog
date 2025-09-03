@@ -8,5 +8,6 @@ builder.Services.AddMudServices();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped<IAgentCatalogService, AgentCatalogService>();
+builder.Services.AddScoped<IAgentChatService, AgentChatService>();
 
 await builder.Build().RunAsync();
