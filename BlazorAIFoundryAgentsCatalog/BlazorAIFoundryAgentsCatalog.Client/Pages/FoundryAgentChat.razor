@@ -1,6 +1,7 @@
 ﻿@page "/agents/{AgentId}"
 @using BlazorAIFoundryAgentsCatalog.Client.DTOs
 @using BlazorAIFoundryAgentsCatalog.Client.Services
+@using Markdig
 @inject IAgentChatService AgentChatService
 
 <PageTitle>Agent Chat</PageTitle>
@@ -23,18 +24,25 @@
         }
         else
         {
-            @foreach (var group in GetGroupedMessages())
+            if (isLoading)
             {
-                <MudChat UserName="@(group.Role == "user" ? "You" : "Agent")"
-                         UserAvatar="@(group.Role == "user" ? Icons.Material.Filled.Person : Icons.Material.Filled.SupportAgent)"
-                         ChatPosition="@(group.Role == "user" ? ChatBubblePosition.End : ChatBubblePosition.Start)">
-                    @foreach (var m in group.Messages)
-                    {
-                        <MudChatBubble Time="@m.Timestamp.ToLocalTime().ToString("g")">
-                            @m.Content
-                        </MudChatBubble>
-                    }
-                </MudChat>
+                <MudProgressCircular Indeterminate="true" />
+            }
+            else
+            {
+                @foreach (var group in GetGroupedMessages())
+                {
+                    <MudChat UserName="@(group.Role == "user" ? "You" : "Agent")"
+                             UserAvatar="@(group.Role == "user" ? Icons.Material.Filled.Person : Icons.Material.Filled.SupportAgent)"
+                             ChatPosition="@(group.Role == "user" ? ChatBubblePosition.End : ChatBubblePosition.Start)">
+                        @foreach (var m in group.Messages)
+                        {
+                            <MudChatBubble Time="@m.Timestamp.ToLocalTime().ToString("g")">
+                                @((MarkupString)Markdig.Markdown.ToHtml(@m.Content))
+                            </MudChatBubble>
+                        }
+                    </MudChat>
+                }
             }
         }
     </div>
@@ -66,7 +74,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        await ResetAgentContext(); 
+        await ResetAgentContext();
 
     }
 
