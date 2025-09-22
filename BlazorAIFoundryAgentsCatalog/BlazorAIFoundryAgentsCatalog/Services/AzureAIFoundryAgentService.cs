@@ -6,14 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace BlazorAIFoundryAgentsCatalog.Services
 {
-    public interface IFoundryAgentProvider
-    {
-        Task<List<ChatMessageDto>> GetChatHistoryAsync(string agentId);
-
-        Task<(string? ThreadId, List<ChatMessageDto>? Messages)> SendMessageAndGetHistoryAsync(string agentId, string userPrompt, string? threadId);
-    }
-
-    public class FoundryAgentProvider : IFoundryAgentProvider
+    public class AzureAIFoundryAgentService : IAzureAIFoundryAgentService
     {
         private readonly AzureAIFoundryOptions _options;
         private readonly string? _endpoint;
@@ -25,7 +18,7 @@ namespace BlazorAIFoundryAgentsCatalog.Services
         public PersistentAgent? Agent { get; private set; }
         public string? AgentId { get; private set; }
 
-        public FoundryAgentProvider(IOptions<AzureAIFoundryOptions> options)
+        public AzureAIFoundryAgentService(IOptions<AzureAIFoundryOptions> options)
         {
             _options = options.Value;
             _endpoint = _options.EndpointUrl;
@@ -37,14 +30,12 @@ namespace BlazorAIFoundryAgentsCatalog.Services
         {
             if (string.IsNullOrWhiteSpace(_endpoint))
             {
-                // not configured in environment/appsettings
                 IsConfigured = false;
                 return;
             }
 
             if (IsConfigured && AgentId == agentId && Client is not null)
             {
-                // already initialized for this agent
                 return;
             }
 
@@ -52,14 +43,14 @@ namespace BlazorAIFoundryAgentsCatalog.Services
 
             if (string.IsNullOrWhiteSpace(threadId))
             {
-                PersistentAgentThread agentThread = await Client.Threads.CreateThreadAsync();
+                PersistentAgentThread agentThread = await Client.Threads.CreateThreadAsync(cancellationToken: cancellationToken);
                 threadId = agentThread.Id;
             }
 
             ThreadId = threadId;
 
             // get agent by id (synchronous call per prior sample)
-            Agent = await Client.Administration.GetAgentAsync(agentId);
+            Agent = await Client.Administration.GetAgentAsync(agentId, cancellationToken);
 
             AgentId = agentId;
             IsConfigured = Agent is not null && !string.IsNullOrWhiteSpace(ThreadId);
@@ -83,7 +74,6 @@ namespace BlazorAIFoundryAgentsCatalog.Services
 
             foreach (var msg in messages)
             {
-                // Map SDK message to your DTO
                 string content = "";
                 if (msg.ContentItems is not null)
                 {
@@ -96,7 +86,7 @@ namespace BlazorAIFoundryAgentsCatalog.Services
 
                 result.Add(new ChatMessageDto(
                     AgentId: agentId,
-                    Role: msg.Role.ToString().ToLowerInvariant(), // "user" or "agent"
+                    Role: msg.Role.ToString().ToLowerInvariant(),
                     Content: content,
                     Timestamp: msg.CreatedAt.UtcDateTime
                 ));
@@ -143,7 +133,7 @@ namespace BlazorAIFoundryAgentsCatalog.Services
                 || run.Status == RunStatus.InProgress
                 || run.Status == RunStatus.RequiresAction);
 
-            // Retrieve messages from the thread (assume ascending order)
+            // Retrieve messages from the thread
             var messagesFromThread = Client.Messages.GetMessages(
                 threadId: threadId,
                 order: ListSortOrder.Ascending);
@@ -162,7 +152,7 @@ namespace BlazorAIFoundryAgentsCatalog.Services
 
                 resultMessages.Add(new ChatMessageDto(
                     AgentId: agentId,
-                    Role: msg.Role.ToString().ToLowerInvariant(), // "user" or "agent"
+                    Role: msg.Role.ToString().ToLowerInvariant(),
                     Content: content,
                     Timestamp: msg.CreatedAt.UtcDateTime
                 ));

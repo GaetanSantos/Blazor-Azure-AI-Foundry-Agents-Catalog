@@ -10,17 +10,17 @@ namespace BlazorAIFoundryAgentsCatalog.Controllers
     [ApiController]
     public class AgentChatController : ControllerBase
     {
-        private readonly IFoundryAgentProvider _provider;
+        private readonly IAzureAIFoundryAgentService _azureAIFoundryAgentService;
 
-        public AgentChatController(IFoundryAgentProvider provider)
+        public AgentChatController(IAzureAIFoundryAgentService azureAIFoundryAgentService)
         {
-            _provider = provider;
+            _azureAIFoundryAgentService = azureAIFoundryAgentService;
         }
 
         [HttpGet("history")]
         public async Task<ActionResult<IEnumerable<ChatMessageDto>>> GetHistory(string agentId)
         {
-            var history = await _provider.GetChatHistoryAsync(agentId);
+            var history = await _azureAIFoundryAgentService.GetChatHistoryAsync(agentId);
             return Ok(history);
         }
 
@@ -30,7 +30,7 @@ namespace BlazorAIFoundryAgentsCatalog.Controllers
             if (string.IsNullOrWhiteSpace(request.AgentId) || string.IsNullOrWhiteSpace(request.UserPrompt))
                 return BadRequest();
 
-            var (threadId, messages) = await _provider.SendMessageAndGetHistoryAsync(request.AgentId, request.UserPrompt, request.ThreadId);
+            var (threadId, messages) = await _azureAIFoundryAgentService.SendMessageAndGetHistoryAsync(request.AgentId, request.UserPrompt, request.ThreadId);
 
             if (string.IsNullOrWhiteSpace(threadId) || messages is null)
                 return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong");

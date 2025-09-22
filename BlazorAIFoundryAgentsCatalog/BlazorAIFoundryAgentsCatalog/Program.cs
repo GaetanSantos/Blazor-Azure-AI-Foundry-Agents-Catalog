@@ -18,7 +18,7 @@ builder.Services.Configure<AzureAIFoundryOptions>(
     builder.Configuration.GetSection("AzureAIFoundry"));
 
 builder.Services.AddScoped<IAzureAIFoundryService, AzureAIFoundryService>();
-builder.Services.AddScoped<IFoundryAgentProvider, FoundryAgentProvider>();
+builder.Services.AddScoped<IAzureAIFoundryAgentService, AzureAIFoundryAgentService>();
 
 builder.Services.AddControllers();
 
