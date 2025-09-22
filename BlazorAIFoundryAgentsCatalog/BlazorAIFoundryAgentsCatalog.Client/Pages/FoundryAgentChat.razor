@@ -9,7 +9,7 @@
 <MudPaper Class="pa-4" Elevation="0">
     <MudText Typo="Typo.h5" GutterBottom="true">Chat with Agent @AgentId</MudText>
 
-    <div style="height:60vh; max-width:600px; overflow-y:auto;" class="mb-4">
+    <div id="chatMessages" style="height:60vh; max-width:100%; overflow-y:auto;" class="mb-4">
         @if (messages is null)
         {
             <MudProgressCircular Indeterminate="true" />
@@ -24,25 +24,27 @@
         }
         else
         {
-            if (isLoading)
+            @foreach (var group in GetGroupedMessages())
             {
-                <MudProgressCircular Indeterminate="true" />
+                <MudChat UserName="@(group.Role == "user" ? "You" : "Agent")"
+                         UserAvatar="@(group.Role == "user" ? Icons.Material.Filled.Person : Icons.Material.Filled.SupportAgent)"
+                         ChatPosition="@(group.Role == "user" ? ChatBubblePosition.End : ChatBubblePosition.Start)">
+                    @foreach (var m in group.Messages)
+                    {
+                        <MudChatBubble Time="@m.Timestamp.ToLocalTime().ToString("g")">
+                            @((MarkupString)Markdig.Markdown.ToHtml(@m.Content))
+                        </MudChatBubble>
+                    }
+                </MudChat>
             }
-            else
+            @if (isLoading)
             {
-                @foreach (var group in GetGroupedMessages())
-                {
-                    <MudChat UserName="@(group.Role == "user" ? "You" : "Agent")"
-                             UserAvatar="@(group.Role == "user" ? Icons.Material.Filled.Person : Icons.Material.Filled.SupportAgent)"
-                             ChatPosition="@(group.Role == "user" ? ChatBubblePosition.End : ChatBubblePosition.Start)">
-                        @foreach (var m in group.Messages)
-                        {
-                            <MudChatBubble Time="@m.Timestamp.ToLocalTime().ToString("g")">
-                                @((MarkupString)Markdig.Markdown.ToHtml(@m.Content))
-                            </MudChatBubble>
-                        }
-                    </MudChat>
-                }
+                <MudChat ChatPosition="ChatBubblePosition.Start" UserName="Agent" UserAvatar="@Icons.Material.Filled.SupportAgent">
+                    <MudChatBubble>
+                        <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="me-2" />
+                        <span>Agent is typing...</span>
+                    </MudChatBubble>
+                </MudChat>
             }
         }
     </div>
@@ -64,6 +66,8 @@
 </MudPaper>
 
 @code {
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+
     [Parameter]
     public string AgentId { get; set; } = string.Empty;
 
@@ -96,22 +100,24 @@
 
         isLoading = true;
 
+        var userPrompt = currentText;
+
         // Optimistically add the user's message
         var userMsg = new ChatMessageDto(
             AgentId: AgentId,
             Role: "user",
-            Content: currentText,
+            Content: userPrompt,
             Timestamp: DateTime.UtcNow
         );
+        currentText = string.Empty;
         messages ??= new List<ChatMessageDto>();
         messages.Add(userMsg);
         StateHasChanged();
 
-        var chatThread = await AgentChatService.SendMessageAndGetHistoryAsync(AgentId, currentText, threadId);
+        var chatThread = await AgentChatService.SendMessageAndGetHistoryAsync(AgentId, userPrompt, threadId);
         if (chatThread is not null)
         {
             messages = chatThread.Messages;
-            currentText = string.Empty;
             StateHasChanged();
             if (string.IsNullOrWhiteSpace(threadId))
             {
@@ -158,4 +164,15 @@
     }
 
     private record MessageGroup(string Role, List<ChatMessageDto> Messages);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (messages is not null && messages.Count > 0)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                var el = document.getElementById('chatMessages');
+                if (el) el.scrollTop = el.scrollHeight;
+            ");
+        }
+    }
 }
