@@ -1,0 +1,40 @@
+﻿/* Light mode (default) */
+.mud-chatbubble table,
+.mud-chat-bubble table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5em 0;
+    font-size: 0.95em;
+}
+
+.mud-chatbubble th, .mud-chatbubble td,
+.mud-chat-bubble th, .mud-chat-bubble td {
+    border: 2px solid #666;
+    padding: 0.4em 0.8em;
+    background: #fff;
+    color: #222;
+}
+
+.mud-chatbubble th, .mud-chat-bubble th {
+    background: #f5f5f5;
+    font-weight: bold;
+    text-align: left;
+}
+
+/* Dark mode overrides */
+.mud-theme-dark .mud-chatbubble table,
+.mud-theme-dark .mud-chat-bubble table {
+    background: #151521;
+}
+
+.mud-theme-dark .mud-chatbubble th, .mud-theme-dark .mud-chatbubble td,
+.mud-theme-dark .mud-chat-bubble th, .mud-theme-dark .mud-chat-bubble td {
+    border: 2px solid #33323e;
+    background: #151521;
+    color: #7e6fff;
+}
+
+.mud-theme-dark .mud-chatbubble th, .mud-theme-dark .mud-chat-bubble th {
+    background: #151521;
+    color: #7e6fff;
+}

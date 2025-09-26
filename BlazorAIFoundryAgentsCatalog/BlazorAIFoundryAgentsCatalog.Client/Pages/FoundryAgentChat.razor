@@ -9,7 +9,7 @@
 <MudPaper Class="pa-4" Elevation="0">
     <MudText Typo="Typo.h5" GutterBottom="true">Chat with Agent @AgentId</MudText>
 
-    <div id="chatMessages" style="height:60vh; max-width:100%; overflow-y:auto;" class="mb-4">
+    <div id="chatMessages" style="height:60vh; width:100%; overflow-y:auto;" class="mb-4">
         @if (messages is null)
         {
             <MudProgressCircular Indeterminate="true" />
@@ -31,8 +31,8 @@
                          ChatPosition="@(group.Role == "user" ? ChatBubblePosition.End : ChatBubblePosition.Start)">
                     @foreach (var m in group.Messages)
                     {
-                        <MudChatBubble Time="@m.Timestamp.ToLocalTime().ToString("g")">
-                            @((MarkupString)Markdig.Markdown.ToHtml(@m.Content))
+                        <MudChatBubble Time="@m.Timestamp.ToLocalTime().ToString("g")" Class="mud-chatbubble">
+                            @((MarkupString)ConvertMarkdownToHtml(@m.Content))
                         </MudChatBubble>
                     }
                 </MudChat>
@@ -174,5 +174,14 @@
                 if (el) el.scrollTop = el.scrollHeight;
             ");
         }
+    }
+
+    private string ConvertMarkdownToHtml(string markdownContent)
+    {
+        var pipeline = new MarkdownPipelineBuilder()
+           .UsePipeTables()
+           .Build();
+
+        return Markdown.ToHtml(markdownContent, pipeline);
     }
 }
