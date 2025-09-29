@@ -32,5 +32,19 @@ namespace BlazorAIFoundryAgentsCatalog.Services
 
             return agents;
         }
+
+        public async Task<AgentDto?> GetAgent(string agentId)
+        {
+            var endpointUri = new Uri(_options.EndpointUrl);
+            var credential = new DefaultAzureCredential();
+            var projectClient = new AIProjectClient(endpointUri, credential);
+            var agentClient = projectClient.GetPersistentAgentsClient();
+
+            var foundryAgent = await agentClient.Administration.GetAgentAsync(agentId);
+
+            return foundryAgent is not null
+                ? new AgentDto(foundryAgent.Value.Id, foundryAgent.Value.Name, foundryAgent.Value.Description)
+                : null;
+        }
     }
 }

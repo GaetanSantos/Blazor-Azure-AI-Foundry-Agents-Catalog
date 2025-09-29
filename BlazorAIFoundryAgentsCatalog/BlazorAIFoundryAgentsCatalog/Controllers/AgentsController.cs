@@ -22,5 +22,15 @@ namespace BlazorAIFoundryAgentsCatalog.Controllers
             var agents = await _azureAIFoundryService.GetAgents();
             return Ok(agents);
         }
+
+
+        [HttpGet("{agentId}")]
+        public async Task<ActionResult<AgentDto>> GetAgentById(string agentId)
+        {
+            var agent = await _azureAIFoundryService.GetAgent(agentId);
+            if (agent is null)
+                return NotFound();
+            return Ok(agent);
+        }
     }
 }

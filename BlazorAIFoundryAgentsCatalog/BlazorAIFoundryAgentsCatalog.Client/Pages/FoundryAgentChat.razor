@@ -1,68 +1,83 @@
 ﻿@page "/agents/{AgentId}"
 @using BlazorAIFoundryAgentsCatalog.Client.DTOs
+@using BlazorAIFoundryAgentsCatalog.Client.Helpers
 @using BlazorAIFoundryAgentsCatalog.Client.Services
 @using Markdig
+@inject IAgentCatalogService AgentCatalogService
 @inject IAgentChatService AgentChatService
 
 <PageTitle>Agent Chat</PageTitle>
 
 <MudPaper Class="pa-4" Elevation="0">
-    <MudText Typo="Typo.h5" GutterBottom="true">Chat with Agent @AgentId</MudText>
+    @if (isAgentInfoLoading)
+    {
+        <MudSkeleton Height="32px" Width="240px" Animation="Animation.Wave" Class="mb-2" />
+        <MudSkeleton Height="20px" Width="80%" Animation="Animation.Wave" Class="mb-4" />
+    }
+    else
+    {
+        <MudText Typo="Typo.h5" GutterBottom="true">Chat with Agent @agentName</MudText>
+        @if (!string.IsNullOrWhiteSpace(agentDescription))
+        {
+            <MudText Typo="Typo.body1" Class="mb-4" Color="Color.Secondary">
+                @agentDescription
+            </MudText>
+        }
 
-    <div id="chatMessages" style="height:60vh; width:100%; overflow-y:auto;" class="mb-4">
-        @if (messages is null)
-        {
-            <MudProgressCircular Indeterminate="true" />
-        }
-        else if (!messages.Any())
-        {
-            <MudChat ChatPosition="ChatBubblePosition.Start">
-                <MudChatBubble Avatar="@Icons.Material.Filled.SupportAgent">
-                    No messages yet. Say hi!
-                </MudChatBubble>
-            </MudChat>
-        }
-        else
-        {
-            @foreach (var group in GetGroupedMessages())
+        <div id="chatMessages" style="height:60vh; width:100%; overflow-y:auto;" class="mb-4">
+            @if (messages is null)
             {
-                <MudChat UserName="@(group.Role == "user" ? "You" : "Agent")"
-                         UserAvatar="@(group.Role == "user" ? Icons.Material.Filled.Person : Icons.Material.Filled.SupportAgent)"
-                         ChatPosition="@(group.Role == "user" ? ChatBubblePosition.End : ChatBubblePosition.Start)">
-                    @foreach (var m in group.Messages)
-                    {
-                        <MudChatBubble Time="@m.Timestamp.ToLocalTime().ToString("g")" Class="mud-chatbubble">
-                            @((MarkupString)ConvertMarkdownToHtml(@m.Content))
-                        </MudChatBubble>
-                    }
-                </MudChat>
+                <MudProgressCircular Indeterminate="true" />
             }
-            @if (isLoading)
+            else if (!messages.Any())
             {
-                <MudChat ChatPosition="ChatBubblePosition.Start" UserName="Agent" UserAvatar="@Icons.Material.Filled.SupportAgent">
-                    <MudChatBubble>
-                        <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="me-2" />
-                        <span>Agent is typing...</span>
+                <MudChat ChatPosition="ChatBubblePosition.Start">
+                    <MudChatBubble Avatar="@Icons.Material.Filled.SupportAgent">
+                        No messages yet. Say hi!
                     </MudChatBubble>
                 </MudChat>
             }
-        }
-    </div>
+            else
+            {
+                @foreach (var m in messages)
+                {
+                    <MudChat UserName="@(m.Role == "user" ? "You" : "Agent")"
+                             UserAvatar="@(m.Role == "user" ? Icons.Material.Filled.Person : Icons.Material.Filled.SupportAgent)"
+                             ChatPosition="@(m.Role == "user" ? ChatBubblePosition.End : ChatBubblePosition.Start)">
+                        <MudAvatar>@(m.Role == "user" ? "You" : StringHelper.GetInitials(agentName))</MudAvatar>
+                        <MudChatBubble Time="@m.Timestamp.ToLocalTime().ToString("g")" Class="mud-chatbubble">
+                            @((MarkupString)ConvertMarkdownToHtml(@m.Content))
+                        </MudChatBubble>
+                    </MudChat>
+                }
+                @if (isLoading)
+                {
+                    <MudChat ChatPosition="ChatBubblePosition.Start" UserName="Agent" UserAvatar="@Icons.Material.Filled.SupportAgent">
+                        <MudAvatar>@StringHelper.GetInitials(agentName)</MudAvatar>
+                        <MudChatBubble>
+                            <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="me-2" />
+                            <span>Agent is typing...</span>
+                        </MudChatBubble>
+                    </MudChat>
+                }
+            }
+        </div>
 
-    <MudStack Direction="Row" Spacing="1">
-        <MudTextField @bind-Value="currentText"
-                      Placeholder="Type a message..."
-                      Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Edit"
-                      FullWidth="true"
-                      OnKeyDown="OnInputKeyDown" />
-        <MudButton Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   OnClick="SendAndRefreshHistory"
-                   Disabled="@isLoading">
-            Send
-        </MudButton>
-    </MudStack>
+        <MudStack Direction="Row" Spacing="1">
+            <MudTextField @bind-Value="currentText"
+                          Placeholder="Type a message..."
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Edit"
+                          FullWidth="true"
+                          OnKeyDown="OnInputKeyDown" />
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="SendAndRefreshHistory"
+                       Disabled="@isLoading">
+                Send
+            </MudButton>
+        </MudStack>
+    }
 </MudPaper>
 
 @code {
@@ -75,11 +90,19 @@
     private string threadId = string.Empty;
     private string currentText = string.Empty;
     private bool isLoading = false;
+    private string agentName = string.Empty;
+    private string agentDescription = string.Empty;
+    private bool isAgentInfoLoading = true;
 
     protected override async Task OnParametersSetAsync()
     {
-        await ResetAgentContext();
+        isAgentInfoLoading = true;
+        var agent = await AgentCatalogService.GetAgentAsync(AgentId);
+        agentName = agent.Name;
+        agentDescription = agent.Description ?? string.Empty;
+        isAgentInfoLoading = false;
 
+        await ResetAgentContext();
     }
 
     private Task ResetAgentContext()
@@ -134,33 +157,6 @@
         {
             await SendAndRefreshHistory();
         }
-    }
-
-    // Helper to group consecutive messages by sender
-    private IEnumerable<MessageGroup> GetGroupedMessages()
-    {
-        if (messages is null || messages.Count == 0)
-            yield break;
-
-        string? lastRole = null;
-        List<ChatMessageDto> group = new();
-
-        foreach (var msg in messages)
-        {
-            if (lastRole == null || msg.Role == lastRole)
-            {
-                group.Add(msg);
-            }
-            else
-            {
-                yield return new MessageGroup(lastRole, group.ToList());
-                group.Clear();
-                group.Add(msg);
-            }
-            lastRole = msg.Role;
-        }
-        if (group.Count > 0 && lastRole != null)
-            yield return new MessageGroup(lastRole, group);
     }
 
     private record MessageGroup(string Role, List<ChatMessageDto> Messages);

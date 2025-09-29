@@ -16,5 +16,10 @@ namespace BlazorAIFoundryAgentsCatalog.Client.Services
         {
             return await _httpClient.GetFromJsonAsync<List<AgentDto>>("api/agents") ?? new();
         }
+
+        public async Task<AgentDto> GetAgentAsync(string agentId)
+        {
+            return await _httpClient.GetFromJsonAsync<AgentDto>($"api/agents/{agentId}/") ?? new AgentDto("Unknown", "Unknown", string.Empty);
+        }
     }
 }
