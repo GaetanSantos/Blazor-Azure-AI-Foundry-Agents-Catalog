@@ -1,0 +1,24 @@
+﻿/* wwwroot/css/markdown.css */
+.markdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    border: 2px solid var(--mud-palette-lines-default); /* Outer border */
+}
+
+    .markdown-table th,
+    .markdown-table td {
+        border: 1px solid var(--mud-palette-lines-default); /* Cell borders */
+        padding: 0.5rem;
+        text-align: left;
+    }
+
+    .markdown-table th {
+        background-color: var(--mud-palette-primary);
+        color: var(--mud-palette-primary-text);
+    }
+
+    .markdown-table td {
+        background-color: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+    }

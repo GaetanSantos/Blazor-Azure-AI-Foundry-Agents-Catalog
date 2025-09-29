@@ -182,6 +182,6 @@
            .UsePipeTables()
            .Build();
 
-        return Markdown.ToHtml(markdownContent, pipeline);
+        return Markdown.ToHtml(markdownContent, pipeline).Replace("<table>", "<table class=\"markdown-table\">");
     }
 }
