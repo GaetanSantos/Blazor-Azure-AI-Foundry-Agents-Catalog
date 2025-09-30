@@ -1,4 +1,6 @@
-﻿namespace BlazorAIFoundryAgentsCatalog.Client.Helpers
+﻿using Markdig;
+
+namespace BlazorAIFoundryAgentsCatalog.Client.Helpers
 {
     public static class StringHelper
     {
@@ -12,5 +14,16 @@
             return initials;
         }
 
+        public static string ConvertMarkdownToHtml(string markdownContent)
+        {
+            if (string.IsNullOrWhiteSpace(markdownContent)) 
+                return string.Empty;
+
+            var pipeline = new MarkdownPipelineBuilder()
+               .UsePipeTables()
+               .Build();
+
+            return Markdown.ToHtml(markdownContent, pipeline).Replace("<table>", "<table class=\"markdown-table\">");
+        }
     }
 }
