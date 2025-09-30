@@ -12,7 +12,6 @@ The Blazor WebAssembly frontend provides a modern and responsive interface to in
 - **Azure AI Foundry Integration:** All chat and agent data is securely managed via Azure AI Foundry APIs, with server-side credential handling.
 - **Responsive UI:** Built with MudBlazor, the app adapts to desktop and mobile devices, and supports light/dark themes.
 - **Markdown rendering:** Agent responses can include source links or tables, which are rendered as HTML in the MudBlazor's chat components.
-- **Blazor WebAssembly Hosted:** The app is hosted with a .NET 9 backend, ensuring scalability and performance.
 
 ## Solution Architecture
 
