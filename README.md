@@ -14,6 +14,26 @@ The Blazor WebAssembly frontend provides a modern and responsive interface to in
 - **Markdown rendering:** Agent responses can include source links or tables, which are rendered as HTML in the MudBlazor's chat components.
 - **Blazor WebAssembly Hosted:** The app is hosted with a .NET 9 backend, ensuring scalability and performance.
 
+## Solution Architecture
+
+This solution is designed to reflect a near real-world architecture with a clear separation of concerns between client and server components:
+
+- **BlazorAIFoundryAgentsCatalog.Client**: This is the client-side Blazor WebAssembly (WASM) application that runs in the browser.
+- **BlazorAIFoundryAgentsCatalog**: This is the server-side project that hosts the client app and can also expose server-side APIs.
+
+### Server Responsibilities
+
+The server project (`BlazorAIFoundryAgentsCatalog`) includes:
+
+- **Dedicated service classes** to handle interactions with external services such as **Azure AI Foundry** and **Azure AI Agent Service**.
+- **API endpoints** exposed via controllers, which are consumed by the Blazor WASM client using `HttpClient`.
+
+### Extensibility
+
+This architecture allows for flexible deployment scenarios. For example, the Azure AI Foundry interactions could be hosted remotely on a separate service such as **Azure App Service** or **Azure Functions**, enabling a more distributed and scalable solution.
+
+> This structure promotes maintainability, scalability, and a clean separation of responsibilities.
+
 ## Demo
 > **Note:** The below demo is provided solely as an example. The configuration of the agents used in the demo is not included in this repository.
 
