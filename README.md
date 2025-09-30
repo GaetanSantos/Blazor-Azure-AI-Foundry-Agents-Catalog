@@ -3,13 +3,27 @@ A Blazor front-end application that dynamically catalogs agents hosted in Azure 
 
 This project demonstrates how to integrate Azure AI Foundry and Azure AI Agent Service into a .NET 9 application using Blazor WebAssembly Hosted. 
 
+## Table of contents
+
+- [Key Features](#key-features)
+- [Solution Architecture](#solution-architecture)
+  - [Server Responsibilities](#server-responsibilities)
+  - [Extensibility Thoughts](#extensibility-thoughts)
+- [Demo](#demo)
+  - [Demo Scope](#dart-demo-scope)
+    - [HarmonicResolver Agent](#mag-harmonicresolver-agent)
+    - [TrackFinder Agent](#cd-trackfinder-agent)
+    - [MixKeyFinder Agent](#musical_score-mixkeyfinder-agent)
+- [Prerequisites](#prerequisites)
+- [Resoursces](#resources)
+
 ## Key Features
 The Blazor WebAssembly frontend provides a modern and responsive interface to interact with the agents:
 
 - **Dynamic Navigation Menu**: One entry per agent, generated at runtime.
 - **Real-Time Chat:** Interact with any agent using a modern chat interface, supporting Markdown (including tables and links).
 - **Isolated Conversations:** Each agent starts a new conversation context upon selection (no chat history).
-- **Azure AI Foundry Integration:** All chat and agent data is securely managed via Azure AI Foundry APIs, with server-side credential handling.
+- **Azure AI Foundry Integration:** All chat and agent data is managed via Azure AI Foundry APIs, with server-side credential handling.
 - **Responsive UI:** Built with MudBlazor, the app adapts to desktop and mobile devices, and supports light/dark themes.
 - **Markdown rendering:** Agent responses can include source links or tables, which are rendered as HTML in the MudBlazor's chat components.
 
@@ -24,12 +38,12 @@ This solution is designed to reflect a near real-world architecture with a clear
 
 The server project (`BlazorAIFoundryAgentsCatalog`) includes:
 
-- **Dedicated service classes** to handle interactions with external services such as **Azure AI Foundry** and **Azure AI Agent Service**.
-- **API endpoints** exposed via controllers, which are consumed by the Blazor WASM client using `HttpClient`.
+- Dedicated service classes to handle interactions with external services such as Azure AI Foundry and Azure AI Agent Service.
+- API endpoints exposed via controllers, which are consumed by the Blazor WASM client using `HttpClient`.
 
-### Extensibility
+### Extensibility Thoughts
 
-This architecture allows for flexible deployment scenarios. For example, the Azure AI Foundry interactions could be hosted remotely on a separate service such as **Azure App Service** or **Azure Functions**, enabling a more distributed and scalable solution.
+This architecture allows for flexible deployment scenarios. For example, the Azure AI Foundry interactions could be hosted remotely on a separate service such as Azure App Service or Azure Functions, enabling a more distributed and scalable solution.
 
 > This structure promotes maintainability, scalability, and a clean separation of responsibilities.
 
