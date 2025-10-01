@@ -15,6 +15,7 @@ This project demonstrates how to integrate Azure AI Foundry and Azure AI Agent S
     - [TrackFinder Agent](#cd-trackfinder-agent)
     - [MixKeyFinder Agent](#musical_score-mixkeyfinder-agent)
 - [Prerequisites](#prerequisites)
+- [Running This Sample](#running-this-sample)
 - [Resoursces](#resources)
 
 ## Key Features
